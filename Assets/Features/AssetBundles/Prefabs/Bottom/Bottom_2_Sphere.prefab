@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8955005676308813113}
   - component: {fileID: 632842297913642056}
   - component: {fileID: 5000087310131213026}
+  - component: {fileID: 28363660538528487}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -2248,6 +2249,22 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 0}
+--- !u!114 &28363660538528487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677201564942329597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdd75e626da412048b3a7ec4790ca9c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RotateXAxis: 0
+  RotateYAxis: 1
+  RotateZAxis: 0
+  AngularSpeed: 50
 --- !u!1 &8972567342064880985
 GameObject:
   m_ObjectHideFlags: 0
