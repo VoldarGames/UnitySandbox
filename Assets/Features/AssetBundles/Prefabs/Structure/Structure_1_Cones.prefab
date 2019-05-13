@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 626045112138433403}
   - component: {fileID: 4512291905432889135}
+  - component: {fileID: 7429427264350683096}
   m_Layer: 0
   m_Name: Structure_1_Cones
-  m_TagString: Untagged
+  m_TagString: ImportablePrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49,6 +50,20 @@ MonoBehaviour:
   renderers: []
   materials: []
   shaders: []
+--- !u!114 &7429427264350683096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2847980323451557424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8767f3610dca9948b089ef32c2b8bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AssetBundleDefinition: {fileID: 11400000, guid: 0770fa56f9fa4d341b188495915d4632,
+    type: 2}
 --- !u!1 &4132609625432804045
 GameObject:
   m_ObjectHideFlags: 0

@@ -11673,9 +11673,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3097601811455600782}
   - component: {fileID: 3223666658606906602}
+  - component: {fileID: -6915393808655968797}
   m_Layer: 0
   m_Name: Ornament_1_Torus
-  m_TagString: Untagged
+  m_TagString: ImportablePrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11710,3 +11711,17 @@ MonoBehaviour:
   renderers: []
   materials: []
   shaders: []
+--- !u!114 &-6915393808655968797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7682877469592917622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8767f3610dca9948b089ef32c2b8bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AssetBundleDefinition: {fileID: 11400000, guid: 399e43db4116f5f4cbb720a89ca92001,
+    type: 2}

@@ -1541,9 +1541,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2377262302783775045}
   - component: {fileID: 1559410256823560286}
+  - component: {fileID: -1161071141350058301}
   m_Layer: 0
   m_Name: Structure_3_Cubes
-  m_TagString: Untagged
+  m_TagString: ImportablePrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1580,6 +1581,20 @@ MonoBehaviour:
   renderers: []
   materials: []
   shaders: []
+--- !u!114 &-1161071141350058301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7375915493853991135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8767f3610dca9948b089ef32c2b8bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AssetBundleDefinition: {fileID: 11400000, guid: 9ceb44b95348a264f8e80010d12789e6,
+    type: 2}
 --- !u!1 &8545286070515143709
 GameObject:
   m_ObjectHideFlags: 0

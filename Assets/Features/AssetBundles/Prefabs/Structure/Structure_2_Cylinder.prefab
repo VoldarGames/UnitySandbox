@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3995467908079879622}
   - component: {fileID: -4284472976761278205}
+  - component: {fileID: -6086806554423097298}
   m_Layer: 0
   m_Name: Structure_2_Cylinder
-  m_TagString: Untagged
+  m_TagString: ImportablePrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -47,6 +48,20 @@ MonoBehaviour:
   renderers: []
   materials: []
   shaders: []
+--- !u!114 &-6086806554423097298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5671414239443797059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8767f3610dca9948b089ef32c2b8bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AssetBundleDefinition: {fileID: 11400000, guid: 7cb6a5be0df8e5048aa0bbcd9424e1bf,
+    type: 2}
 --- !u!1 &6163068434676730169
 GameObject:
   m_ObjectHideFlags: 0

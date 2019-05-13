@@ -456,9 +456,10 @@ GameObject:
   m_Component:
   - component: {fileID: 157669524806966087}
   - component: {fileID: 8670009525133336089}
+  - component: {fileID: 2991965633500119873}
   m_Layer: 0
   m_Name: Shape_3_Cone
-  m_TagString: Untagged
+  m_TagString: ImportablePrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -493,3 +494,17 @@ MonoBehaviour:
   renderers: []
   materials: []
   shaders: []
+--- !u!114 &2991965633500119873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4807905864813658022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8767f3610dca9948b089ef32c2b8bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AssetBundleDefinition: {fileID: 11400000, guid: 456853f708b2d7142a934512d6698db4,
+    type: 2}

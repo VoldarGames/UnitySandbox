@@ -101,9 +101,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3470586252308603212}
   - component: {fileID: 2856506929255030721}
+  - component: {fileID: -8191987534557988507}
   m_Layer: 0
   m_Name: Shape_2_CubeUnity
-  m_TagString: Untagged
+  m_TagString: ImportablePrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -138,3 +139,17 @@ MonoBehaviour:
   renderers: []
   materials: []
   shaders: []
+--- !u!114 &-8191987534557988507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7816996675596835630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8767f3610dca9948b089ef32c2b8bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AssetBundleDefinition: {fileID: 11400000, guid: 7df1f250c9de6c84aafbe3e70a0097bd,
+    type: 2}
