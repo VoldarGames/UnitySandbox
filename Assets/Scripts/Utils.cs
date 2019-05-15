@@ -40,4 +40,6 @@ public static class Utils
         var go = assetBundle.LoadAsset<GameObject>(assetBundle.GetAllAssetNames()[0]);
         return Object.Instantiate(go, position, Quaternion.identity, parent);
     }
+
+    public static readonly string ProjectPath = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
 }

@@ -9,6 +9,9 @@ public class AssetBundlesLoader : MonoBehaviour
 {
     public Vector3 SpawnVector3 = new Vector3(2, 0, 0);
 
+    public RenderTexture MyRenderTexture;
+    public Texture2D MyTexture2D;
+
     static UnityEngine.UI.Text DebugText;
     static List<string> assetBundleNamesList = new List<string>();
 
@@ -27,17 +30,12 @@ public class AssetBundlesLoader : MonoBehaviour
                 LoadSavedShield();
             }
         ));
-        }
-        catch (FileNotFoundException)
-        {
-            Debug.Log("Generating new shield...");
-            GenerateRandomShield();
-        }
-        catch(Exception e)
+        }        
+        catch (Exception e)
         {
             Debug.LogError(e.Message + e.StackTrace);
             DebugText.text += e.StackTrace;
-        }                
+        }       
     }
 
     public void LateUpdate()
@@ -45,6 +43,19 @@ public class AssetBundlesLoader : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.K))
         {
             ScreenCapture.CaptureScreenshot("Assets/Features/AssetBundles/BuildFolder/Screenshot.png");
+
+            ///Render texture to PNG
+            MyTexture2D = new Texture2D(256, 256);
+
+            RenderTexture.active = MyRenderTexture;
+            MyTexture2D.ReadPixels(new Rect(0, 0, MyTexture2D.width, MyTexture2D.height), 0, 0);
+            MyTexture2D.Apply();
+
+            byte[] bytes;
+            bytes = MyTexture2D.EncodeToPNG();
+
+            System.IO.File.WriteAllBytes("Assets/Features/AssetBundles/BuildFolder/VirtualScreenshot.png", bytes);
+            ////            
         }
     }
 
@@ -52,18 +63,32 @@ public class AssetBundlesLoader : MonoBehaviour
     {
         if(PlayerPrefs.GetInt(Constants.PlayerPrefsKeys.SavedShield, 0) == 1)
         {
-            Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationShape)),
+            try
+            {
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationShape)),
                 SpawnVector3, CurrentParent);
-            Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationOrnament)),
-                SpawnVector3, CurrentParent);
-            Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationBottom)),
-                SpawnVector3, CurrentParent);
-            Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationStructure)),
-                SpawnVector3, CurrentParent);
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationOrnament)),
+                    SpawnVector3, CurrentParent);
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationBottom)),
+                    SpawnVector3, CurrentParent);
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationStructure)),
+                    SpawnVector3, CurrentParent);
+            }
+            catch(Exception)
+            {
+                Debug.Log("Unsaved shield");
+                Debug.Log("Generating new shield...");
+                GenerateRandomShield();
+                SaveCurrentSelectionToFile();
+            }
+            
         }
         else
         {
             Debug.Log("Unsaved shield");
+            Debug.Log("Generating new shield...");
+            GenerateRandomShield();
+            SaveCurrentSelectionToFile();
         }
 
     }
