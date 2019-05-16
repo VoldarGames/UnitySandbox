@@ -8,15 +8,14 @@ using UnityEngine.Networking;
 public class AssetBundlesLoader : MonoBehaviour
 {
     public Vector3 SpawnVector3 = new Vector3(2, 0, 0);
-
+    public static Transform[] CaptureParents;
     public RenderTexture MyRenderTexture;
     public Texture2D MyTexture2D;
 
     static UnityEngine.UI.Text DebugText;
     static List<string> assetBundleNamesList = new List<string>();
-
-    static Dictionary<string, string> currentAssetBundlesSelection = new Dictionary<string, string>();
     static Transform CurrentParent;
+    static Dictionary<string, string> currentAssetBundlesSelection = new Dictionary<string, string>();
     static List<AssetBundle> cachedAssetBundles;
 
     public void Start()
@@ -36,27 +35,6 @@ public class AssetBundlesLoader : MonoBehaviour
             Debug.LogError(e.Message + e.StackTrace);
             DebugText.text += e.StackTrace;
         }       
-    }
-
-    public void LateUpdate()
-    {
-        if(Input.GetKeyDown(KeyCode.K))
-        {
-            ScreenCapture.CaptureScreenshot("Assets/Features/AssetBundles/BuildFolder/Screenshot.png");
-
-            ///Render texture to PNG
-            MyTexture2D = new Texture2D(256, 256);
-
-            RenderTexture.active = MyRenderTexture;
-            MyTexture2D.ReadPixels(new Rect(0, 0, MyTexture2D.width, MyTexture2D.height), 0, 0);
-            MyTexture2D.Apply();
-
-            byte[] bytes;
-            bytes = MyTexture2D.EncodeToPNG();
-
-            System.IO.File.WriteAllBytes("Assets/Features/AssetBundles/BuildFolder/VirtualScreenshot.png", bytes);
-            ////            
-        }
     }
 
     public void LoadSavedShield()
@@ -81,7 +59,6 @@ public class AssetBundlesLoader : MonoBehaviour
                 GenerateRandomShield();
                 SaveCurrentSelectionToFile();
             }
-            
         }
         else
         {
@@ -93,18 +70,23 @@ public class AssetBundlesLoader : MonoBehaviour
 
     }
 
-    public void GenerateRandomShield()
+    public void GenerateRandomShield(Vector3 position = default(Vector3), int parentIndex = -1)
     {
-        DeleteCurrentSelection();
-
-        cachedAssetBundles = AssetBundle.GetAllLoadedAssetBundles().ToList();
+        if(parentIndex < 0)
+        {
+            DeleteCurrentSelection();
+        }
+        else
+        {
+            DeleteCaptureSelection(parentIndex);
+        }        
 
         try
         {
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Shape));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Ornament));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Bottom));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Structure));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Shape, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Ornament, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Bottom, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Structure, position, parentIndex));
         }
         catch (Exception e)
         {
@@ -115,14 +97,23 @@ public class AssetBundlesLoader : MonoBehaviour
         
     }
 
+    public void DeleteCaptureSelection(int parentIndex)
+    {
+        for (int i = 0; i < CaptureParents[parentIndex].childCount; i++)
+        {
+            Destroy(CaptureParents[parentIndex].GetChild(i).gameObject);
+        }
+    }
+
     public void DeleteCurrentSelection()
     {
         currentAssetBundlesSelection.Clear();
 
         for (int i = 0; i < CurrentParent.childCount; i++)
-        {
+        {         
             Destroy(CurrentParent.GetChild(i).gameObject);
         }
+        
     }
 
     public void SaveCurrentSelectionToFile()
@@ -158,7 +149,7 @@ public class AssetBundlesLoader : MonoBehaviour
         }
     }
 
-    static IEnumerator<object> InstantiateRandomShieldLocation(ShieldLocation location)
+    static IEnumerator<object> InstantiateRandomShieldLocation(ShieldLocation location, Vector3 position = default(Vector3), int parentIndex = -1)
     {
         var prefixLocation = Constants.Prefixes.AssetBundleLocation + location.Value;
         var prefixAssetList = assetBundleNamesList.Where(s => s.StartsWith(prefixLocation)).ToArray();
@@ -171,6 +162,8 @@ public class AssetBundlesLoader : MonoBehaviour
 
         AssetBundle downloadedAssetBundle = null;
         UnityWebRequest request = null;
+
+        cachedAssetBundles = AssetBundle.GetAllLoadedAssetBundles().ToList();
         AssetBundle cachedAssetBundle = cachedAssetBundles.FirstOrDefault(a => a.name == prefixAssetList[randomIndex]);
 
         if (cachedAssetBundle == null)
@@ -205,7 +198,7 @@ public class AssetBundlesLoader : MonoBehaviour
 
         try
         {
-            var go = Utils.InstantiateAssetBundle(downloadedAssetBundle, new Vector3(2, 0, 0), CurrentParent);
+            var go = Utils.InstantiateAssetBundle(downloadedAssetBundle, position, parentIndex < 0 ? CurrentParent : CaptureParents[parentIndex]);
 
             var importablePrefab = go.GetComponent<ImportablePrefab>();
             var assetBundleDef = importablePrefab.AssetBundleDefinition;

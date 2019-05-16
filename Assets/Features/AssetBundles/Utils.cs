@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 
 public static class Utils
@@ -38,7 +40,21 @@ public static class Utils
     public static GameObject InstantiateAssetBundle(AssetBundle assetBundle, Vector3 position, Transform parent)
     {
         var go = assetBundle.LoadAsset<GameObject>(assetBundle.GetAllAssetNames()[0]);
-        return Object.Instantiate(go, position, Quaternion.identity, parent);
+        return UnityEngine.Object.Instantiate(go, position, Quaternion.identity, parent);
+    }
+
+    public static void Debounce(Action action, ref int lastDebounce, int milliseconds = 100)
+    {
+        var current = Interlocked.Increment(ref lastDebounce);
+
+        Debug.LogWarning($"Debounce--> current: {current} , last: {lastDebounce}");
+
+        Thread.Sleep(milliseconds);
+        if (current == lastDebounce)
+        {
+            Thread.Sleep(milliseconds);
+            action();
+        }
     }
 
     public static readonly string ProjectPath = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));

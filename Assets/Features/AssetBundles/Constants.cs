@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public struct Constants
+﻿public struct Constants
 {
     public struct Prefixes
     {
@@ -15,6 +11,7 @@ public struct Constants
         public const string ImportablePrefabs = "Assets/Features/AssetBundles";
         public const string AssetBundlesBuildFolder = "Assets/Features/AssetBundles/BuildFolder";
         public const string AssetBundlesNames = "AssetBundleNames.csv";
+        public const string Pngs = "pngs";
     }
 
     public struct Locations
@@ -36,7 +33,17 @@ public struct Constants
 
     public struct Routes
     {
-        public const string BackendIp = "http://172.16.11.36:8080/";
+        public const string BackendIp = "http://127.0.0.1:8080/"; //office "http://172.16.11.36:8080/"
         public const string AssetBundlesNames = BackendIp + Paths.AssetBundlesNames;
+
+        public const string RequestRandomShieldGuid = "/RequestRandomShieldGuid";
+        public const string GetGifByGuid = "/GetGifByGuid";
+    }
+
+    public struct SceneManagers
+    {
+        public const string AssetBundlesLoader = "AssetBundlesLoader";
+        public const string GifCaptureManager = "GifCaptureManager";
+        public const string CaptureJobsManager = "CaptureJobsManager";
     }
 }
