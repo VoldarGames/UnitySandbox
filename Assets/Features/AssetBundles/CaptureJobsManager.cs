@@ -14,6 +14,7 @@ public class CaptureJobsManager : MonoBehaviour
     bool[] availableSlots;
     public GameObject GifCapturerCameraPrefab;
     public bool AutoRun;
+    public int AutoDispatchSeconds = 5;
     public int MaxConcurrentJobs = 10;
     public float CamerasX = 3f;
     public float CamerasY = 1.5f;
@@ -33,6 +34,7 @@ public class CaptureJobsManager : MonoBehaviour
 
     public void Start()
     {
+        Logger.Log($"Setting up Capture Jobs Manager with {MaxConcurrentJobs} max concurrent jobs");
         SetupGifCaptureManagers();
         SetupCaptureParents();
         if (AutoRun)
@@ -71,14 +73,20 @@ public class CaptureJobsManager : MonoBehaviour
 
     public void Run()
     {
-        if (isRunning) return;
-        
+        if (isRunning) {
+            Logger.Log($"Capture jobs manager was already running", Logger.LogLevel.Warning);
+            return;
+        }
+
+        Logger.Log($"Run capture jobs manager");
         isRunning = true;
         captureJobsList.CollectionChanged += HandleCaptureJobCollectionChanged;
+        InvokeRepeating(nameof(DispatchQueueJobs), AutoDispatchSeconds, AutoDispatchSeconds);
     }
 
     public void CleanCompletedJobs()
     {
+        Logger.Log($"Cleaning completed jobs");
         var completedJobs = captureJobsList.Where(c => c.Status == CaptureJobStatus.Completed);
         foreach (var job in completedJobs)
         {
@@ -88,6 +96,7 @@ public class CaptureJobsManager : MonoBehaviour
 
     public void FreeSlot(int slotIndex)
     {
+        Logger.Log($"Free slot {slotIndex}", Logger.LogLevel.Debug);
         availableSlots[slotIndex] = true;
         AssetBundlesLoader.DeleteCaptureSelection(slotIndex);
     }
@@ -183,6 +192,11 @@ public class CaptureJobsManager : MonoBehaviour
     }
 
     void HandleCaptureJobCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        DispatchQueueJobs();
+    }
+
+    void DispatchQueueJobs()
     {
         currentConcurrentJobs = captureJobsList.Count(job => job.Status == CaptureJobStatus.InProgress);
         if (currentConcurrentJobs < MaxConcurrentJobs)

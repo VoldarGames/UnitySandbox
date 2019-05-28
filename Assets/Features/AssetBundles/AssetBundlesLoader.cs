@@ -32,7 +32,7 @@ public class AssetBundlesLoader : MonoBehaviour
         }        
         catch (Exception e)
         {
-            Debug.LogError(e.Message + e.StackTrace);
+            Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
             DebugText.text += e.StackTrace;
         }       
     }
@@ -43,6 +43,7 @@ public class AssetBundlesLoader : MonoBehaviour
         {
             try
             {
+                Logger.Log("Loading previous saved shield");
                 Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationShape)),
                 SpawnVector3, CurrentParent);
                 Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationOrnament)),
@@ -54,16 +55,14 @@ public class AssetBundlesLoader : MonoBehaviour
             }
             catch(Exception)
             {
-                Debug.Log("Unsaved shield");
-                Debug.Log("Generating new shield...");
+                Logger.Log("Unsaved shield, generating a new one...");
                 GenerateRandomShield();
                 SaveCurrentSelectionToFile();
             }
         }
         else
         {
-            Debug.Log("Unsaved shield");
-            Debug.Log("Generating new shield...");
+            Logger.Log("Unsaved shield, generating a new one...");
             GenerateRandomShield();
             SaveCurrentSelectionToFile();
         }
@@ -72,7 +71,8 @@ public class AssetBundlesLoader : MonoBehaviour
 
     public void GenerateRandomShield(Vector3 position = default(Vector3), int parentIndex = -1)
     {
-        if(parentIndex < 0)
+        Logger.Log($"Generating random shield at {position}");
+        if (parentIndex < 0)
         {
             DeleteCurrentSelection();
         }
@@ -92,13 +92,14 @@ public class AssetBundlesLoader : MonoBehaviour
         {
             var errorMsg = $"Failed to connect to asset bundles server: {e.Message}";
             DebugText.text = errorMsg;
-            Debug.LogError(errorMsg);
+            Logger.Log(errorMsg, Logger.LogLevel.Error);
         }
         
     }
 
     public void DeleteCaptureSelection(int parentIndex)
     {
+        Logger.Log($"Deleting childs of slot {parentIndex}", Logger.LogLevel.Debug);
         for (int i = 0; i < CaptureParents[parentIndex].childCount; i++)
         {
             Destroy(CaptureParents[parentIndex].GetChild(i).gameObject);
@@ -107,13 +108,13 @@ public class AssetBundlesLoader : MonoBehaviour
 
     public void DeleteCurrentSelection()
     {
+        Logger.Log($"Deleting childs of main selection", Logger.LogLevel.Debug);
         currentAssetBundlesSelection.Clear();
 
         for (int i = 0; i < CurrentParent.childCount; i++)
         {         
             Destroy(CurrentParent.GetChild(i).gameObject);
-        }
-        
+        }        
     }
 
     public void SaveCurrentSelectionToFile()
@@ -128,7 +129,7 @@ public class AssetBundlesLoader : MonoBehaviour
             UnityWebRequest www = UnityWebRequest.Get(Constants.Routes.BackendIp + assetBundleName);
             yield return www.SendWebRequest();
             File.WriteAllBytes(Application.persistentDataPath + "/" + assetBundleName, www.downloadHandler.data);
-            Debug.Log($"Saved in {Application.persistentDataPath + "/" + assetBundleName}");
+            Logger.Log($"Saved in {Application.persistentDataPath + "/" + assetBundleName}", Logger.LogLevel.Info);           
             if(assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Shape.Value))
             {
                 PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationShape, assetBundleName);
@@ -170,14 +171,14 @@ public class AssetBundlesLoader : MonoBehaviour
         {
             string uri = Constants.Routes.BackendIp + prefixAssetList[randomIndex];
 
-            Debug.Log($"Request {uri}");
+            Logger.Log($"Request {uri}", Logger.LogLevel.Info);
 
             request = UnityWebRequestAssetBundle.GetAssetBundle(uri, 0);
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
             {
                 DebugText.text += "NetworkError, HttpError " + request.error;
-                Debug.LogError("NetworkError, HttpError : " + request.error);
+                Logger.Log($"NetworkError, HttpError : " + request.error, Logger.LogLevel.Error);
                 yield break;
             }
             downloadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
@@ -189,8 +190,8 @@ public class AssetBundlesLoader : MonoBehaviour
 
         if (downloadedAssetBundle == null)
         {
-            Debug.LogError("Failed to load AssetBundle! Download failed for " + prefixAssetList[randomIndex]
-            + request.error + request.downloadHandler.text);
+            Logger.Log("Failed to load AssetBundle! Download failed for " + prefixAssetList[randomIndex]
+            + request.error + request.downloadHandler.text, Logger.LogLevel.Error);            
             yield break;
         }
 
@@ -204,8 +205,8 @@ public class AssetBundlesLoader : MonoBehaviour
             var assetBundleDef = importablePrefab.AssetBundleDefinition;
         }
         catch (Exception e)
-        {
-            Debug.LogError(e.Message + e.StackTrace);
+        {            
+            Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
             DebugText.text += e.Message;
         }
     }
@@ -217,8 +218,8 @@ public class AssetBundlesLoader : MonoBehaviour
         yield return request.SendWebRequest();
 
         if(request.isHttpError || request.isNetworkError)
-        {
-            Debug.LogError(request.error);
+        {            
+            Logger.Log(request.error, Logger.LogLevel.Error);
             DebugText.text = request.error;
             yield break;
         }
@@ -226,7 +227,8 @@ public class AssetBundlesLoader : MonoBehaviour
         if (string.IsNullOrEmpty(request.downloadHandler.text))
         {
             var msgError = Constants.Paths.AssetBundlesNames + "couldn't be retrieved";
-            Debug.LogError(msgError);
+
+            Logger.Log(msgError, Logger.LogLevel.Error);
             DebugText.text = msgError;
             yield break;
         }

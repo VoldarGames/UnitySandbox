@@ -31,7 +31,7 @@ public static class Utils
         if (assetBundle == null)
         {
             var errorMsg = file + "doesn't exist on Persistent Data Path";
-            Debug.LogError(errorMsg);
+            Logger.Log(errorMsg, Logger.LogLevel.Error);            
             throw new FileNotFoundException(errorMsg);
         }
         return assetBundle;
@@ -46,8 +46,7 @@ public static class Utils
     public static void Debounce(Action action, ref int lastDebounce, int milliseconds = 100)
     {
         var current = Interlocked.Increment(ref lastDebounce);
-
-        Debug.LogWarning($"Debounce--> current: {current} , last: {lastDebounce}");
+        Logger.Log($"Debounce--> current: {current} , last: {lastDebounce}", Logger.LogLevel.Debug);        
 
         Thread.Sleep(milliseconds);
         if (current == lastDebounce)

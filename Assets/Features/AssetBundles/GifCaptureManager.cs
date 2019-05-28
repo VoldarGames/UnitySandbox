@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class GifCaptureManager : MonoBehaviour
 {
     FileSystemWatcher watcher;
@@ -29,7 +30,7 @@ public class GifCaptureManager : MonoBehaviour
         colorBuffer.ReadPixels(new Rect(0, 0, colorBuffer.width, colorBuffer.height), 0, 0);
         colorBuffer.Apply();
         startTime = Time.time;
-        Debug.Log("Start rendering camera GIF");
+        Logger.Log($"Start rendering job {currentCaptureJob.Guid} with settings {GifWidth}x{GifHeight} framerate {FrameRate} capture time {CaptureTime}");
     }
 
     public void StopCapturing()
@@ -92,8 +93,8 @@ public class GifCaptureManager : MonoBehaviour
             if (Time.time > (startTime + CaptureTime))
             {
                 StopCapturing();
-                Encode();
-                Debug.Log("Render Finished!");
+                Encode();                
+                Logger.Log($"Render job {currentCaptureJob.Guid} finished!");
             }
         }
     }
@@ -109,6 +110,7 @@ public class GifCaptureManager : MonoBehaviour
         System.Diagnostics.Process ffmpeg = new System.Diagnostics.Process();
         ffmpeg.StartInfo.FileName = "C:\\Windows\\system32\\cmd.exe";
         ffmpeg.StartInfo.Arguments = "/c " + "cd " + Utils.ProjectPath + $" && del out.gif && ffmpeg\\ffmpeg.exe -i {Constants.Paths.Pngs}{currentCaptureJob.slotIndex}\\%d.png -f gif -y {currentCaptureJob.Guid.ToString()}.gif";
+        Logger.Log($"Starting ffmpeg encoding for job {currentCaptureJob.Guid}");
         ffmpeg.Start();
     }
 
