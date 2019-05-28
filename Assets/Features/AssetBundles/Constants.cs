@@ -9,26 +9,24 @@
     public struct Paths
     {
         public const string ImportablePrefabs = "Assets/Features/AssetBundles";
-        public const string AssetBundlesBuildFolder = "Assets/Features/AssetBundles/BuildFolder";
+        public const string AssetBundlesBuildFolderAndroid = "Assets/Features/AssetBundles/BuildFolder/Android";
+        public const string AssetBundlesBuildFolderIOS = "Assets/Features/AssetBundles/BuildFolder/iOS";
+        public const string AssetBundlesBuildFolderStandalone = "Assets/Features/AssetBundles/BuildFolder/Standalone";
         public const string AssetBundlesNames = "AssetBundleNames.csv";
         public const string Pngs = "pngs";
-    }
-
-    public struct Locations
-    {
-        public const string Ornament = "ornament";
-        public const string Shape = "shape";
-        public const string Bottom = "bottom";
-        public const string Structure = "structure";
     }
 
     public struct PlayerPrefsKeys
     {
         public const string SavedShield = "SavedShield";
+        public const string SavedLocationBanner = "SavedLocationBanner";
+        public const string SavedLocationFrame = "SavedLocationFrame";
+        public const string SavedLocationSecondFrame = "SavedLocationSecondFrame";
+        public const string SavedLocationThirdFrame = "SavedLocationThirdFrame";
         public const string SavedLocationShape = "SavedLocationShape";
-        public const string SavedLocationOrnament = "SavedLocationOrnament";
-        public const string SavedLocationStructure = "SavedLocationStructure";
-        public const string SavedLocationBottom = "SavedLocationbottom";
+        public const string SavedLocationSymbol = "SavedLocationSymbol";
+        public const string SavedLocationTop = "SavedLocationTop";
+        public const string SavedLocationWings = "SavedLocationWings";
     }
 
     public struct Routes

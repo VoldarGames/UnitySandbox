@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 
 public class AssetBundlesLoader : MonoBehaviour
 {
-    public Vector3 SpawnVector3 = new Vector3(2, 0, 0);
+    public Vector3 SpawnVector3 = new Vector3(0, 0, 0);
     public static Transform[] CaptureParents;
     public RenderTexture MyRenderTexture;
     public Texture2D MyTexture2D;
@@ -44,14 +44,38 @@ public class AssetBundlesLoader : MonoBehaviour
             try
             {
                 Logger.Log("Loading previous saved shield");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationShape)),
-                SpawnVector3, CurrentParent);
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationOrnament)),
-                    SpawnVector3, CurrentParent);
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationBottom)),
-                    SpawnVector3, CurrentParent);
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationStructure)),
-                    SpawnVector3, CurrentParent);
+
+                var shapePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationShape);
+                Logger.Log($"Shape: {shapePath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(shapePath), SpawnVector3, CurrentParent);
+
+                var framePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationFrame);
+                Logger.Log($"Frame: {framePath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(framePath), SpawnVector3, CurrentParent);
+
+                var secondFramePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationSecondFrame);
+                Logger.Log($"Second Frame: {secondFramePath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(secondFramePath), SpawnVector3, CurrentParent);
+
+                var thirdFramePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationThirdFrame);
+                Logger.Log($"Third Frame: {thirdFramePath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(thirdFramePath), SpawnVector3, CurrentParent);
+
+                var bannerPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationBanner);
+                Logger.Log($"Banner: {bannerPath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(bannerPath), SpawnVector3, CurrentParent);
+
+                var symbolPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationSymbol);
+                Logger.Log($"Symbol: {symbolPath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(symbolPath), SpawnVector3, CurrentParent);
+
+                var topPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationTop);
+                Logger.Log($"Top: {topPath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(topPath), SpawnVector3, CurrentParent);
+
+                var wingsPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationWings);
+                Logger.Log($"Wings: {wingsPath}");
+                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(wingsPath), SpawnVector3, CurrentParent);
             }
             catch(Exception)
             {
@@ -69,7 +93,12 @@ public class AssetBundlesLoader : MonoBehaviour
 
     }
 
-    public void GenerateRandomShield(Vector3 position = default(Vector3), int parentIndex = -1)
+    public void GenerateRandomShield()
+    {
+        GenerateRandomShield(Vector3.zero);
+    }
+
+    public void GenerateRandomShield(Vector3 position, int parentIndex = -1)
     {
         Logger.Log($"Generating random shield at {position}");
         if (parentIndex < 0)
@@ -83,10 +112,14 @@ public class AssetBundlesLoader : MonoBehaviour
 
         try
         {
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Banner, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Frame, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Frame, position, parentIndex, acceptsNone: true, ShieldLocation.FrameSecond));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Frame, position, parentIndex, acceptsNone: true, ShieldLocation.FrameThird));
             StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Shape, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Ornament, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Bottom, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Structure, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Symbol, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Top, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Wings, position, parentIndex));
         }
         catch (Exception e)
         {
@@ -134,23 +167,40 @@ public class AssetBundlesLoader : MonoBehaviour
             {
                 PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationShape, assetBundleName);
             }
-            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Ornament.Value))
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Frame.Value))
             {
-                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationOrnament, assetBundleName);
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationFrame, assetBundleName);
             }
-            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Bottom.Value))
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Banner.Value))
             {
-                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationBottom, assetBundleName);
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationBanner, assetBundleName);
+            }                        
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Symbol.Value))
+            {
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationSymbol, assetBundleName);
             }
-            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Structure.Value))
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.FrameSecond.Value))
             {
-                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationStructure, assetBundleName);
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationSecondFrame, assetBundleName);
+            }
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Top.Value))
+            {
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationTop, assetBundleName);
+            }
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.Wings.Value))
+            {
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationWings, assetBundleName);
+            }
+            else if (assetBundleName.StartsWith(Constants.Prefixes.AssetBundleLocation + ShieldLocation.FrameThird.Value))
+            {
+                PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationThirdFrame, assetBundleName);
             }
             PlayerPrefs.SetInt(Constants.PlayerPrefsKeys.SavedShield, 1);
         }
     }
 
-    static IEnumerator<object> InstantiateRandomShieldLocation(ShieldLocation location, Vector3 position = default(Vector3), int parentIndex = -1)
+    static IEnumerator<object> InstantiateRandomShieldLocation(ShieldLocation location, Vector3 position = default(Vector3), 
+        int parentIndex = -1, bool acceptsNone = false, ShieldLocation keySelection = null)
     {
         var prefixLocation = Constants.Prefixes.AssetBundleLocation + location.Value;
         var prefixAssetList = assetBundleNamesList.Where(s => s.StartsWith(prefixLocation)).ToArray();
@@ -158,7 +208,20 @@ public class AssetBundlesLoader : MonoBehaviour
         int randomIndex = 0;
         if(prefixAssetListCount > 1)
         {
-            randomIndex = UnityEngine.Random.Range(0, prefixAssetListCount);
+            randomIndex = UnityEngine.Random.Range(acceptsNone ? -1 : 0, prefixAssetListCount);
+        }
+
+        if(randomIndex == -1)
+        {
+            if(keySelection != null)
+            {
+                currentAssetBundlesSelection[keySelection.Value] = string.Empty;
+            }
+            else
+            {
+                currentAssetBundlesSelection[location.Value] = string.Empty;
+            }            
+            yield break;
         }
 
         AssetBundle downloadedAssetBundle = null;
@@ -195,7 +258,14 @@ public class AssetBundlesLoader : MonoBehaviour
             yield break;
         }
 
-        currentAssetBundlesSelection[location.Value] = prefixAssetList[randomIndex];
+        if (keySelection != null)
+        {
+            currentAssetBundlesSelection[keySelection.Value] = prefixAssetList[randomIndex];
+        }
+        else
+        {
+            currentAssetBundlesSelection[location.Value] = prefixAssetList[randomIndex];
+        }
 
         try
         {

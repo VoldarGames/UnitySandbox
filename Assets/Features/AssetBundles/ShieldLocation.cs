@@ -3,10 +3,14 @@
 /// </summary>
 public sealed class ShieldLocation
 {
+    public static readonly ShieldLocation Banner = new ShieldLocation("banner");
+    public static readonly ShieldLocation Frame = new ShieldLocation("frame");
+    public static readonly ShieldLocation FrameSecond = new ShieldLocation("framesecond");
+    public static readonly ShieldLocation FrameThird = new ShieldLocation("framethird");
     public static readonly ShieldLocation Shape = new ShieldLocation("shape");
-    public static readonly ShieldLocation Structure = new ShieldLocation("structure");
-    public static readonly ShieldLocation Ornament = new ShieldLocation("ornament");
-    public static readonly ShieldLocation Bottom = new ShieldLocation("bottom");
+    public static readonly ShieldLocation Symbol = new ShieldLocation("symbol");
+    public static readonly ShieldLocation Top = new ShieldLocation("top");
+    public static readonly ShieldLocation Wings = new ShieldLocation("wings");
 
     private ShieldLocation(string value)
     {

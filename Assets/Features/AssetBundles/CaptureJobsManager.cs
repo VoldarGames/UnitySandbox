@@ -65,7 +65,10 @@ public class CaptureJobsManager : MonoBehaviour
             GifCaptureManagers[i] = Instantiate(GifCapturerCameraPrefab, new Vector3(CamerasX, CamerasY + SpacingPerCamera * i, CamerasZ), Quaternion.identity).GetComponent<GifCaptureManager>();
             var renderTexture = new RenderTexture(GifCaptureManagers[i].GifWidth, GifCaptureManagers[i].GifHeight, 16, RenderTextureFormat.Default);
             GifCaptureManagers[i].MyRenderTexture = renderTexture;
-            GifCaptureManagers[i].GetComponent<RotateAround>().Target = new Vector3(RotateAroundTargetX, RotateAroundTargetY + i * SpacingPerCamera, RotateAroundTargetZ);
+            var rotateAroundBehaviour = GifCaptureManagers[i].GetComponent<RotateAround>();
+            rotateAroundBehaviour.Target = new Vector3(RotateAroundTargetX, RotateAroundTargetY + i * SpacingPerCamera, RotateAroundTargetZ);
+            rotateAroundBehaviour.LimitAngle = true;
+            rotateAroundBehaviour.AngleLimit = 45f;
             GifCaptureManagers[i].GetComponent<Camera>().targetTexture = GifCaptureManagers[i].MyRenderTexture;
             GifCaptureManagers[i].CaptureJobsManager = this;
         }

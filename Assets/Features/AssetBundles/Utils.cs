@@ -27,6 +27,8 @@ public static class Utils
 
     public static AssetBundle LoadAssetBundleFromFile(string file)
     {
+        if (string.IsNullOrEmpty(file)) return null;
+
         var assetBundle = AssetBundle.LoadFromFile(Application.persistentDataPath + "/" + file);
         if (assetBundle == null)
         {
@@ -39,6 +41,8 @@ public static class Utils
 
     public static GameObject InstantiateAssetBundle(AssetBundle assetBundle, Vector3 position, Transform parent)
     {
+        if (assetBundle == null) return null;
+
         var go = assetBundle.LoadAsset<GameObject>(assetBundle.GetAllAssetNames()[0]);
         return UnityEngine.Object.Instantiate(go, position, Quaternion.identity, parent);
     }
