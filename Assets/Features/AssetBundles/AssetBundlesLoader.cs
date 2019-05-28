@@ -26,7 +26,7 @@ public class AssetBundlesLoader : MonoBehaviour
         {
             StartCoroutine(InitAssetBundleNamesList(() =>
             {
-                LoadSavedShield();
+                //LoadSavedShield();
             }
         ));
         }        

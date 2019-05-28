@@ -43,3 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b2e0371169f81b43aa8083e4d527e44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SpawnVector3: {x: 0, y: 0, z: 0}
+  MyRenderTexture: {fileID: 8400000, guid: 1fe29ceda60a15e478e7d25c41f97a23, type: 2}
+  MyTexture2D: {fileID: 0}
