@@ -109,7 +109,7 @@ public class GifCaptureManager : MonoBehaviour
 
         System.Diagnostics.Process ffmpeg = new System.Diagnostics.Process();
         ffmpeg.StartInfo.FileName = "C:\\Windows\\system32\\cmd.exe";
-        ffmpeg.StartInfo.Arguments = "/c " + "cd " + Utils.ProjectPath + $" && del out.gif && ffmpeg\\ffmpeg.exe -i {Constants.Paths.Pngs}{currentCaptureJob.slotIndex}\\%d.png -f gif -y {currentCaptureJob.Guid.ToString()}.gif";
+        ffmpeg.StartInfo.Arguments = "/c " + "cd " + Utils.ProjectPath + $" && ffmpeg\\ffmpeg.exe -i {Constants.Paths.Pngs}{currentCaptureJob.slotIndex}\\%d.png -f gif -y -loop -1 {currentCaptureJob.Guid.ToString()}.gif";
         Logger.Log($"Starting ffmpeg encoding for job {currentCaptureJob.Guid}");
         ffmpeg.Start();
     }
