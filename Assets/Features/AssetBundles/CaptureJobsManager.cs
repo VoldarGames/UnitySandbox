@@ -69,6 +69,7 @@ public class CaptureJobsManager : MonoBehaviour
             rotateAroundBehaviour.Target = new Vector3(RotateAroundTargetX, RotateAroundTargetY + i * SpacingPerCamera, RotateAroundTargetZ);
             rotateAroundBehaviour.LimitAngle = true;
             rotateAroundBehaviour.AngleLimit = 45f;
+            rotateAroundBehaviour.Speed = 18;
             GifCaptureManagers[i].GetComponent<Camera>().targetTexture = GifCaptureManagers[i].MyRenderTexture;
             GifCaptureManagers[i].CaptureJobsManager = this;
         }

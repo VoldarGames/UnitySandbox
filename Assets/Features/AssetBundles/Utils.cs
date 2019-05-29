@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -58,6 +59,17 @@ public static class Utils
             Thread.Sleep(milliseconds);
             action();
         }
+    }
+
+    public static int Random(int min, int max, params int[] banList)
+    {
+        if (max - min <= banList.Length) return -1;
+        var result = UnityEngine.Random.Range(min, max);
+        if (banList.Contains(result))
+        {
+            Random(min, max, banList);
+        }
+        return result;
     }
 
     public static readonly string ProjectPath = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));

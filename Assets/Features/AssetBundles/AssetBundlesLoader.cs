@@ -113,12 +113,16 @@ public class AssetBundlesLoader : MonoBehaviour
         try
         {
             StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Banner, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Frame, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Frame, position, parentIndex, acceptsNone: true, ShieldLocation.FrameSecond));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Frame, position, parentIndex, acceptsNone: true, ShieldLocation.FrameThird));
+
+            var frameIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame);
+            var frameSecondIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex);
+            var frameThirdIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex, frameSecondIndex);
+            StartCoroutine(InstantiateShieldLocation(frameIndex, ShieldLocation.Frame, position, parentIndex));
+            StartCoroutine(InstantiateShieldLocation(frameSecondIndex, ShieldLocation.FrameSecond, position, parentIndex));
+            StartCoroutine(InstantiateShieldLocation(frameThirdIndex, ShieldLocation.FrameThird, position, parentIndex));
             StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Shape, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Symbol, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Top, position, parentIndex));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Symbol, position, parentIndex, acceptsNone: true));
+            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Top, position, parentIndex, acceptsNone: true));
             StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Wings, position, parentIndex));
         }
         catch (Exception e)
@@ -196,6 +200,78 @@ public class AssetBundlesLoader : MonoBehaviour
                 PlayerPrefs.SetString(Constants.PlayerPrefsKeys.SavedLocationThirdFrame, assetBundleName);
             }
             PlayerPrefs.SetInt(Constants.PlayerPrefsKeys.SavedShield, 1);
+        }
+    }
+
+    static int GetRandomShieldLocationIndex(ShieldLocation location, bool acceptsNone = false, params int[] bannedIndexes)
+    {
+        var prefixLocation = Constants.Prefixes.AssetBundleLocation + location.Value;
+        var prefixAssetList = assetBundleNamesList.Where(s => s.StartsWith(prefixLocation)).ToArray();
+        var prefixAssetListCount = prefixAssetList.Count();
+        int randomIndex = 0;
+        if (prefixAssetListCount > 1)
+        {
+            randomIndex = Utils.Random(acceptsNone ? -1 : 0, prefixAssetListCount, bannedIndexes);
+        }
+
+        return randomIndex != -1 ? assetBundleNamesList.IndexOf(prefixAssetList[randomIndex]) : -1;
+    }
+
+    static IEnumerator<object> InstantiateShieldLocation(int index, ShieldLocation keySelection, Vector3 position = default, int parentIndex = -1)
+    {
+        if (index == -1)
+        {            
+            currentAssetBundlesSelection[keySelection.Value] = string.Empty;            
+            yield break;
+        }
+
+        AssetBundle downloadedAssetBundle = null;
+        UnityWebRequest request = null;
+
+        cachedAssetBundles = AssetBundle.GetAllLoadedAssetBundles().ToList();
+        AssetBundle cachedAssetBundle = cachedAssetBundles.FirstOrDefault(a => a.name == assetBundleNamesList[index]);
+
+        if (cachedAssetBundle == null)
+        {
+            string uri = Constants.Routes.BackendIp + assetBundleNamesList[index];
+
+            Logger.Log($"Request {uri}", Logger.LogLevel.Info);
+
+            request = UnityWebRequestAssetBundle.GetAssetBundle(uri, 0);
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                DebugText.text += "NetworkError, HttpError " + request.error;
+                Logger.Log($"NetworkError, HttpError : " + request.error, Logger.LogLevel.Error);
+                yield break;
+            }
+            downloadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
+        }
+        else
+        {
+            downloadedAssetBundle = cachedAssetBundle;
+        }
+
+        if (downloadedAssetBundle == null)
+        {
+            Logger.Log("Failed to load AssetBundle! Download failed for " + assetBundleNamesList[index]
+            + request.error + request.downloadHandler.text, Logger.LogLevel.Error);
+            yield break;
+        }
+
+        currentAssetBundlesSelection[keySelection.Value] = assetBundleNamesList[index];        
+
+        try
+        {
+            var go = Utils.InstantiateAssetBundle(downloadedAssetBundle, position, parentIndex < 0 ? CurrentParent : CaptureParents[parentIndex]);
+
+            var importablePrefab = go.GetComponent<ImportablePrefab>();
+            var assetBundleDef = importablePrefab.AssetBundleDefinition;
+        }
+        catch (Exception e)
+        {
+            Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
+            DebugText.text += e.Message;
         }
     }
 

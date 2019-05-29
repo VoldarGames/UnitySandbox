@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {x: 1, y: 0, z: -1}
-  Speed: 38
+  Speed: 18
   LimitAngle: 1
   AngleLimit: 45
 --- !u!108 &57683430
