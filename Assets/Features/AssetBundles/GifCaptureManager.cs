@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -8,34 +9,39 @@ public class GifCaptureManager : MonoBehaviour
     FileSystemWatcher watcher;
     CaptureJob currentCaptureJob;
     List<byte[]> pngs = new List<byte[]>();
-    float T = 0;
-    float startTime = 0;
-    float period;
+
     Texture2D colorBuffer;
     int lastDebounce;
     public CaptureJobsManager CaptureJobsManager;
     public bool Capturing { get; private set; }
-    public float CaptureTime = 10;    
-    public float FrameRate = 15;
     public RenderTexture MyRenderTexture;
     public int GifWidth = 256;
     public int GifHeight = 256;
+    public AnimationController AnimationController;
 
     public void StartCapturing(CaptureJob captureJob)
     {
         Capturing = true;
         currentCaptureJob = captureJob;          
         pngs.Clear();
-        RenderTexture.active = MyRenderTexture;
-        colorBuffer.ReadPixels(new Rect(0, 0, colorBuffer.width, colorBuffer.height), 0, 0);
-        colorBuffer.Apply();
-        startTime = Time.time;
-        Logger.Log($"Start rendering job {currentCaptureJob.Guid} with settings {GifWidth}x{GifHeight} framerate {FrameRate} capture time {CaptureTime}");
+
+        AnimationController = AssetBundlesLoader.CaptureParents[currentCaptureJob.slotIndex].GetComponent<AnimationController>();
+        AnimationController.AnimationFinished += HandleAnimationFinished;
+        AnimationController.Init();        
+        Logger.Log($"Start rendering job {currentCaptureJob.Guid} with settings {GifWidth}x{GifHeight} capture time {AnimationController.AnimationDuration}");
+    }
+
+    void HandleAnimationFinished()
+    {
+        StopCapturing();
+        Encode();
+        Logger.Log($"Render job {currentCaptureJob.Guid} finished!");
     }
 
     public void StopCapturing()
     {
-        Capturing = false;        
+        Capturing = false;
+        AnimationController.AnimationFinished -= HandleAnimationFinished;
     }
 
     public void InitializeFileSystemWatcher()
@@ -54,7 +60,6 @@ public class GifCaptureManager : MonoBehaviour
 
     void Start()
     {
-        period = 1f / FrameRate;
         colorBuffer = new Texture2D(GifWidth, GifHeight, TextureFormat.RGB24, false);
         InitializeFileSystemWatcher();
     }
@@ -63,9 +68,19 @@ public class GifCaptureManager : MonoBehaviour
     {
         if (Capturing)
         {
+            AnimationController.NextFrame();
             //Necessary for batchmode
             GetComponent<Camera>().Render();
+            CaptureFrame();
         }
+    }
+
+    void CaptureFrame()
+    {
+        RenderTexture.active = MyRenderTexture;
+        colorBuffer.ReadPixels(new Rect(0, 0, colorBuffer.width, colorBuffer.height), 0, 0, false);
+        colorBuffer.Apply();
+        pngs.Add(ImageConversion.EncodeToPNG(colorBuffer));
     }
 
     void OnDestroy()
@@ -75,29 +90,7 @@ public class GifCaptureManager : MonoBehaviour
             watcher.Created -= HandleGifFileChanged;
             watcher.Changed -= HandleGifFileChanged;
         }        
-    }
-
-    void OnPostRender()
-    {
-        if (Capturing)
-        {
-            T += Time.deltaTime;
-            if (T >= period)
-            {
-                T = 0;
-                RenderTexture.active = MyRenderTexture;
-                colorBuffer.ReadPixels(new Rect(0, 0, colorBuffer.width, colorBuffer.height), 0, 0, false);
-                colorBuffer.Apply();
-                pngs.Add(ImageConversion.EncodeToPNG(colorBuffer));
-            }
-            if (Time.time > (startTime + CaptureTime))
-            {
-                StopCapturing();
-                Encode();                
-                Logger.Log($"Render job {currentCaptureJob.Guid} finished!");
-            }
-        }
-    }
+    }    
 
     void Encode()
     {

@@ -25,12 +25,14 @@ public class CaptureJobsManager : MonoBehaviour
     public float RotateAroundTargetY = 0f;
     public float RotateAroundTargetZ = -1f;
 
-    public float SpawnX = 2f;
+    public float SpawnX = 0f;
     public float SpawnY = 0f;
     public float SpawnZ = 0f;
 
     public AssetBundlesLoader AssetBundlesLoader;
     public GifCaptureManager[] GifCaptureManagers;
+
+    public AnimationClip defaultAnimationClip;
 
     public void Start()
     {
@@ -54,6 +56,9 @@ public class CaptureJobsManager : MonoBehaviour
         for (int i = 0; i < MaxConcurrentJobs; i++)
         {
             AssetBundlesLoader.CaptureParents[i] = new GameObject($"CaptureParent{i}").transform;
+            AssetBundlesLoader.CaptureParents[i].position = new Vector3(SpawnX, SpawnY + SpacingPerCamera * i, SpawnZ);
+            AssetBundlesLoader.CaptureParents[i].gameObject.AddComponent<AnimationController>();
+            AssetBundlesLoader.CaptureParents[i].GetComponent<Animation>().clip = defaultAnimationClip;
         }
     }
 
@@ -65,11 +70,12 @@ public class CaptureJobsManager : MonoBehaviour
             GifCaptureManagers[i] = Instantiate(GifCapturerCameraPrefab, new Vector3(CamerasX, CamerasY + SpacingPerCamera * i, CamerasZ), Quaternion.identity).GetComponent<GifCaptureManager>();
             var renderTexture = new RenderTexture(GifCaptureManagers[i].GifWidth, GifCaptureManagers[i].GifHeight, 16, RenderTextureFormat.Default);
             GifCaptureManagers[i].MyRenderTexture = renderTexture;
-            var rotateAroundBehaviour = GifCaptureManagers[i].GetComponent<RotateAround>();
-            rotateAroundBehaviour.Target = new Vector3(RotateAroundTargetX, RotateAroundTargetY + i * SpacingPerCamera, RotateAroundTargetZ);
-            rotateAroundBehaviour.LimitAngle = true;
-            rotateAroundBehaviour.AngleLimit = 45f;
-            rotateAroundBehaviour.Speed = 18;
+            //var rotateAroundBehaviour = GifCaptureManagers[i].GetComponent<RotateAround>();
+            //rotateAroundBehaviour.Target = new Vector3(RotateAroundTargetX, RotateAroundTargetY + i * SpacingPerCamera, RotateAroundTargetZ);
+            //rotateAroundBehaviour.LimitAngle = true;
+            //rotateAroundBehaviour.AngleLimit = 45f;
+            //rotateAroundBehaviour.Speed = 18;            
+
             GifCaptureManagers[i].GetComponent<Camera>().targetTexture = GifCaptureManagers[i].MyRenderTexture;
             GifCaptureManagers[i].CaptureJobsManager = this;
         }
