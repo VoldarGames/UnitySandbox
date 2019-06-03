@@ -50,6 +50,7 @@ public struct Constants
         public const string RequestRandomShieldGuid = "/RequestRandomShieldGuid";
         public const string GetGifByGuid = "/GetGifByGuid";
         public const string GetPngByGuid = "/GetPngByGuid";
+        public const string GetShieldByUserId = "/GetShieldByUserId";
     }
 
     public struct SceneManagers

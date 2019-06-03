@@ -154,7 +154,9 @@ public class CaptureJobsManager : MonoBehaviour
             AssignSlot(job);
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                AssetBundlesLoader.GenerateRandomShield(new Vector3(SpawnX, SpawnY + job.slotIndex * SpacingPerCamera, SpawnZ), job.slotIndex);
+                var shield = AssetBundlesLoader.GenerateRandomShield(new Vector3(SpawnX, SpawnY + job.slotIndex * SpacingPerCamera, SpawnZ), job.slotIndex);
+                //Save shield selection
+                File.WriteAllText($"{job.UserId}.shield", JsonUtility.ToJson(shield));                
                 GifCaptureManagers[job.slotIndex].StartCapturing(job);
             });
         }

@@ -141,8 +141,39 @@ public class HttpServerManager : MonoBehaviour
                 currentContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
         }
+        else if (request.Url.AbsolutePath == Constants.Routes.GetShieldByUserId)
+        {
+            try
+            {
+                //PARSE QUERIES...
+                var fileShieldPath = $"{request.Url.Query.Replace("?q=", string.Empty)}.shield";
+                if(File.Exists(fileShieldPath))
+                {
+                    var shieldJson = File.ReadAllText(fileShieldPath);
+
+                    currentContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                    using (var s = currentContext.Response.OutputStream)
+                    {
+                        var buffer = ASCIIEncoding.ASCII.GetBytes(shieldJson);
+                        s.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                else
+                {
+                    Logger.Log($"Current user id {fileShieldPath} doesnt have any shield generated", Logger.LogLevel.Warning);
+                    currentContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                }
+
+            }
+            catch(Exception e)
+            {
+                Logger.Log(e.Message, Logger.LogLevel.Error);
+                currentContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+        }
         else
         {
+            Logger.Log($"Route {request.Url.AbsolutePath} Not found", Logger.LogLevel.Error);
             currentContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
             currentContext.Response.Close();
         }
