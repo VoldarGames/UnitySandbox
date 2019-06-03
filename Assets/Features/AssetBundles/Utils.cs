@@ -64,6 +64,7 @@ public static class Utils
     public static int Random(int min, int max, params int[] banList)
     {
         if (max - min <= banList.Length) return -1;
+        if (min == max) return min;
         var result = UnityEngine.Random.Range(min, max);
         if (banList.Contains(result))
         {

@@ -12,6 +12,14 @@ public class AssetBundlesLoader : MonoBehaviour
     public RenderTexture MyRenderTexture;
     public Texture2D MyTexture2D;
 
+    public AnimationClip[] TopAnimationClips;
+    public AnimationClip[] FrameAnimationClips;
+    public AnimationClip[] ShapeAnimationClips;
+    public AnimationClip[] SymbolAnimationClips;
+    public AnimationClip[] BannerAnimationClips;
+    public AnimationClip[] WingsAnimationClips;
+
+    Dictionary<ShieldLocation, AnimationClip[]> AnimationsDictionary = new Dictionary<ShieldLocation, AnimationClip[]>();
     static UnityEngine.UI.Text DebugText;
     static List<string> assetBundleNamesList = new List<string>();
     static Transform CurrentParent;
@@ -20,6 +28,14 @@ public class AssetBundlesLoader : MonoBehaviour
 
     public void Start()
     {
+        AnimationsDictionary.Add(ShieldLocation.Banner, BannerAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.Frame, FrameAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.FrameSecond, FrameAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.FrameThird, FrameAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.Top, TopAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.Symbol, SymbolAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.Wings, WingsAnimationClips);
+        AnimationsDictionary.Add(ShieldLocation.Shape, ShapeAnimationClips);
         DebugText = GameObject.Find("Text").GetComponent<UnityEngine.UI.Text>();
         CurrentParent = transform;
         try
@@ -98,7 +114,7 @@ public class AssetBundlesLoader : MonoBehaviour
         GenerateRandomShield(Vector3.zero);
     }
 
-    public void GenerateRandomShield(Vector3 position, int parentIndex = -1)
+    public void GenerateRandomShield(Vector3 position, int parentIndex = -1, Action<bool> generationFinished = null)  
     {
         Logger.Log($"Generating random shield at {position}");
         if (parentIndex < 0)
@@ -112,18 +128,35 @@ public class AssetBundlesLoader : MonoBehaviour
 
         try
         {
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Banner, position, parentIndex));
+            int generationCounter = 0;
+            int toReachCounter = 8;
+            Action<bool> onInstantiateFinish = success =>
+            {
+                VerifyGenerationResult(success, ref generationCounter, toReachCounter, generationFinished);
+            };
+            // Hay que esperar a que se generen todas las piezas para poder empezar a iterar las animaciones en el capturador
+
+            var bannerIndex = GetRandomShieldLocationIndex(ShieldLocation.Banner);            
+            StartCoroutine(InstantiateShieldLocation(bannerIndex, ShieldLocation.Banner, position, parentIndex, onInstantiateFinish));
 
             var frameIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame);
             var frameSecondIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex);
             var frameThirdIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex, frameSecondIndex);
-            StartCoroutine(InstantiateShieldLocation(frameIndex, ShieldLocation.Frame, position, parentIndex));
-            StartCoroutine(InstantiateShieldLocation(frameSecondIndex, ShieldLocation.FrameSecond, position, parentIndex));
-            StartCoroutine(InstantiateShieldLocation(frameThirdIndex, ShieldLocation.FrameThird, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Shape, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Symbol, position, parentIndex, acceptsNone: true));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Top, position, parentIndex, acceptsNone: true));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Wings, position, parentIndex));
+            StartCoroutine(InstantiateShieldLocation(frameIndex, ShieldLocation.Frame, position, parentIndex, onInstantiateFinish));
+            StartCoroutine(InstantiateShieldLocation(frameSecondIndex, ShieldLocation.FrameSecond, position, parentIndex, onInstantiateFinish));
+            StartCoroutine(InstantiateShieldLocation(frameThirdIndex, ShieldLocation.FrameThird, position, parentIndex, onInstantiateFinish));
+
+            var shapeIndex = GetRandomShieldLocationIndex(ShieldLocation.Shape);
+            StartCoroutine(InstantiateShieldLocation(shapeIndex, ShieldLocation.Shape, position, parentIndex, onInstantiateFinish));
+
+            var symbolIndex = GetRandomShieldLocationIndex(ShieldLocation.Symbol, acceptsNone: true);
+            StartCoroutine(InstantiateShieldLocation(symbolIndex, ShieldLocation.Symbol, position, parentIndex, onInstantiateFinish));
+
+            var topIndex = GetRandomShieldLocationIndex(ShieldLocation.Top, acceptsNone: true);
+            StartCoroutine(InstantiateShieldLocation(topIndex, ShieldLocation.Top, position, parentIndex, onInstantiateFinish));
+
+            var wingsIndex = GetRandomShieldLocationIndex(ShieldLocation.Wings, acceptsNone: true);
+            StartCoroutine(InstantiateShieldLocation(wingsIndex, ShieldLocation.Wings, position, parentIndex, onInstantiateFinish));
         }
         catch (Exception e)
         {
@@ -132,6 +165,22 @@ public class AssetBundlesLoader : MonoBehaviour
             Logger.Log(errorMsg, Logger.LogLevel.Error);
         }
         
+    }
+
+    void VerifyGenerationResult(bool success, ref int generationCounter, int toReachCounter, Action<bool> successAction)
+    {
+        if(success)
+        {
+            generationCounter++;
+            if(toReachCounter == generationCounter)
+            {
+                successAction?.Invoke(true);
+            }
+        }
+        else
+        {
+            successAction?.Invoke(false);
+        }
     }
 
     public void DeleteCaptureSelection(int parentIndex)
@@ -217,11 +266,12 @@ public class AssetBundlesLoader : MonoBehaviour
         return randomIndex != -1 ? assetBundleNamesList.IndexOf(prefixAssetList[randomIndex]) : -1;
     }
 
-    static IEnumerator<object> InstantiateShieldLocation(int index, ShieldLocation keySelection, Vector3 position = default, int parentIndex = -1)
+    IEnumerator<object> InstantiateShieldLocation(int index, ShieldLocation keySelection, Vector3 position = default, int parentIndex = -1, Action<bool> OnInstantiateFinish = null)
     {
         if (index == -1)
         {            
-            currentAssetBundlesSelection[keySelection.Value] = string.Empty;            
+            currentAssetBundlesSelection[keySelection.Value] = string.Empty;
+            OnInstantiateFinish?.Invoke(true);
             yield break;
         }
 
@@ -243,6 +293,7 @@ public class AssetBundlesLoader : MonoBehaviour
             {
                 DebugText.text += "NetworkError, HttpError " + request.error;
                 Logger.Log($"NetworkError, HttpError : " + request.error, Logger.LogLevel.Error);
+                OnInstantiateFinish?.Invoke(false);
                 yield break;
             }
             downloadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
@@ -256,6 +307,7 @@ public class AssetBundlesLoader : MonoBehaviour
         {
             Logger.Log("Failed to load AssetBundle! Download failed for " + assetBundleNamesList[index]
             + request.error + request.downloadHandler.text, Logger.LogLevel.Error);
+            OnInstantiateFinish?.Invoke(false);
             yield break;
         }
 
@@ -264,97 +316,30 @@ public class AssetBundlesLoader : MonoBehaviour
         try
         {
             var go = Utils.InstantiateAssetBundle(downloadedAssetBundle, position, parentIndex < 0 ? CurrentParent : CaptureParents[parentIndex]);
+            go.AddComponent<AnimationController>();
+            int selectedAnimationIndex = GetRandomShieldLocationAnimationIndex(keySelection);
+            go.GetComponent<Animation>().clip = AnimationsDictionary[keySelection][selectedAnimationIndex];
 
             var importablePrefab = go.GetComponent<ImportablePrefab>();
             var assetBundleDef = importablePrefab.AssetBundleDefinition;
+
+            OnInstantiateFinish?.Invoke(true);
         }
         catch (Exception e)
         {
             Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
             DebugText.text += e.Message;
+            OnInstantiateFinish?.Invoke(false);
         }
     }
 
-    static IEnumerator<object> InstantiateRandomShieldLocation(ShieldLocation location, Vector3 position = default(Vector3), 
-        int parentIndex = -1, bool acceptsNone = false, ShieldLocation keySelection = null)
+    int GetRandomShieldLocationAnimationIndex(ShieldLocation location)
     {
-        var prefixLocation = Constants.Prefixes.AssetBundleLocation + location.Value;
-        var prefixAssetList = assetBundleNamesList.Where(s => s.StartsWith(prefixLocation)).ToArray();
-        var prefixAssetListCount = prefixAssetList.Count();
-        int randomIndex = 0;
-        if(prefixAssetListCount > 1)
+        if (AnimationsDictionary.ContainsKey(location))
         {
-            randomIndex = UnityEngine.Random.Range(acceptsNone ? -1 : 0, prefixAssetListCount);
+            return Utils.Random(0, AnimationsDictionary[location].Length);
         }
-
-        if(randomIndex == -1)
-        {
-            if(keySelection != null)
-            {
-                currentAssetBundlesSelection[keySelection.Value] = string.Empty;
-            }
-            else
-            {
-                currentAssetBundlesSelection[location.Value] = string.Empty;
-            }            
-            yield break;
-        }
-
-        AssetBundle downloadedAssetBundle = null;
-        UnityWebRequest request = null;
-
-        cachedAssetBundles = AssetBundle.GetAllLoadedAssetBundles().ToList();
-        AssetBundle cachedAssetBundle = cachedAssetBundles.FirstOrDefault(a => a.name == prefixAssetList[randomIndex]);
-
-        if (cachedAssetBundle == null)
-        {
-            string uri = Constants.Routes.BackendIp + prefixAssetList[randomIndex];
-
-            Logger.Log($"Request {uri}", Logger.LogLevel.Info);
-
-            request = UnityWebRequestAssetBundle.GetAssetBundle(uri, 0);
-            yield return request.SendWebRequest();
-            if (request.isNetworkError || request.isHttpError)
-            {
-                DebugText.text += "NetworkError, HttpError " + request.error;
-                Logger.Log($"NetworkError, HttpError : " + request.error, Logger.LogLevel.Error);
-                yield break;
-            }
-            downloadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
-        }
-        else
-        {
-            downloadedAssetBundle = cachedAssetBundle;
-        }
-
-        if (downloadedAssetBundle == null)
-        {
-            Logger.Log("Failed to load AssetBundle! Download failed for " + prefixAssetList[randomIndex]
-            + request.error + request.downloadHandler.text, Logger.LogLevel.Error);            
-            yield break;
-        }
-
-        if (keySelection != null)
-        {
-            currentAssetBundlesSelection[keySelection.Value] = prefixAssetList[randomIndex];
-        }
-        else
-        {
-            currentAssetBundlesSelection[location.Value] = prefixAssetList[randomIndex];
-        }
-
-        try
-        {
-            var go = Utils.InstantiateAssetBundle(downloadedAssetBundle, position, parentIndex < 0 ? CurrentParent : CaptureParents[parentIndex]);
-
-            var importablePrefab = go.GetComponent<ImportablePrefab>();
-            var assetBundleDef = importablePrefab.AssetBundleDefinition;
-        }
-        catch (Exception e)
-        {            
-            Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
-            DebugText.text += e.Message;
-        }
+        return -1;
     }
 
     IEnumerator<object> InitAssetBundleNamesList(Action onEndCoroutineCallback)

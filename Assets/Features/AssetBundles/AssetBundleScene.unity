@@ -213,7 +213,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 57683424}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a843a950857b2945983297450731c7f, type: 3}
   m_Name: 
@@ -295,12 +295,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CaptureJobsManager: {fileID: 1037487082}
-  CaptureTime: 10
-  FrameRate: 15
   MyRenderTexture: {fileID: 8400000, guid: 1fe29ceda60a15e478e7d25c41f97a23, type: 2}
   GifWidth: 256
   GifHeight: 256
-  AnimationController: {fileID: 0}
+  LongestAnimationController: {fileID: 0}
+  AnimationControllers: []
 --- !u!1 &60659131
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,31 +470,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 107378581}
   m_CullTransparentMesh: 0
---- !u!1 &129288931 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8483293879142174066, guid: 1000c0e685715fd419c2018f92f531bc,
-    type: 3}
-  m_PrefabInstance: {fileID: 8483293878355811261}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &129288932
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 129288931}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5352c273603bac841a3f6f8d02536abb, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &136979155
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,7 +687,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 8483293878355811261}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 129288931}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b2e0371169f81b43aa8083e4d527e44, type: 3}
@@ -752,7 +726,7 @@ MonoBehaviour:
     type: 3}
   AutoRun: 1
   AutoDispatchSeconds: 2
-  MaxConcurrentJobs: 200
+  MaxConcurrentJobs: 20
   CamerasX: 0
   CamerasY: 0
   CamerasZ: -2
@@ -765,8 +739,6 @@ MonoBehaviour:
   SpawnZ: 0
   AssetBundlesLoader: {fileID: 696207504}
   GifCaptureManagers: []
-  defaultAnimationClip: {fileID: 7400000, guid: 0be52a387b55af8439fc6085a875bce9,
-    type: 2}
 --- !u!4 &1037487083
 Transform:
   m_ObjectHideFlags: 0
@@ -1205,6 +1177,9 @@ Animation:
   m_Animation: {fileID: 7400000, guid: 0be52a387b55af8439fc6085a875bce9, type: 2}
   m_Animations:
   - {fileID: 7400000, guid: 0be52a387b55af8439fc6085a875bce9, type: 2}
+  - {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+  - {fileID: 7400000, guid: f0b43f0a580a64f46b7672b74bcdc99c, type: 2}
+  - {fileID: 7400000, guid: dbbf10145258b3343affe0c3197ba3cf, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
@@ -1275,7 +1250,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1575065025}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0007953272, y: 3.7701132, z: 8.11988}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1287,7 +1262,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh71282
+  m_Name: pb_Mesh-41444
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3000,9 +2975,109 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
         type: 3}
+      propertyPath: TopAnimationClips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: FrameAnimationClips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: ShapeAnimationClips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: SymbolAnimationClips.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: BannerAnimationClips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: WingsAnimationClips.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
       propertyPath: MyRenderTexture2
       value: 
       objectReference: {fileID: 8400000, guid: 163aed12c7ded944098f725764d1ef2f, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: defaultAnimationClip
+      value: 
+      objectReference: {fileID: 7400000, guid: 0be52a387b55af8439fc6085a875bce9, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: TopAnimationClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: FrameAnimationClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: ShapeAnimationClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: SymbolAnimationClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: BannerAnimationClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: WingsAnimationClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 7400000, guid: 5a5ffbce60ec76640add22682224b69e, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: FrameAnimationClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 7400000, guid: 0be52a387b55af8439fc6085a875bce9, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: FrameAnimationClips.Array.data[2]
+      value: 
+      objectReference: {fileID: 7400000, guid: f0b43f0a580a64f46b7672b74bcdc99c, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: ShapeAnimationClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 7400000, guid: 0be52a387b55af8439fc6085a875bce9, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: ShapeAnimationClips.Array.data[2]
+      value: 
+      objectReference: {fileID: 7400000, guid: f0b43f0a580a64f46b7672b74bcdc99c, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: TopAnimationClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 7400000, guid: dbbf10145258b3343affe0c3197ba3cf, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: TopAnimationClips.Array.data[2]
+      value: 
+      objectReference: {fileID: 7400000, guid: f0b43f0a580a64f46b7672b74bcdc99c, type: 2}
+    - target: {fileID: 4865901981849808845, guid: 1000c0e685715fd419c2018f92f531bc,
+        type: 3}
+      propertyPath: BannerAnimationClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 7400000, guid: f0b43f0a580a64f46b7672b74bcdc99c, type: 2}
     - target: {fileID: 8483293879142174060, guid: 1000c0e685715fd419c2018f92f531bc,
         type: 3}
       propertyPath: m_LocalPosition.x

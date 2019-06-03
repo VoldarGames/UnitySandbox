@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
@@ -17,7 +18,8 @@ public class GifCaptureManager : MonoBehaviour
     public RenderTexture MyRenderTexture;
     public int GifWidth = 256;
     public int GifHeight = 256;
-    public AnimationController AnimationController;
+    public AnimationController LongestAnimationController;
+    public AnimationController[] AnimationControllers;
 
     public void StartCapturing(CaptureJob captureJob)
     {
@@ -25,10 +27,16 @@ public class GifCaptureManager : MonoBehaviour
         currentCaptureJob = captureJob;          
         pngs.Clear();
 
-        AnimationController = AssetBundlesLoader.CaptureParents[currentCaptureJob.slotIndex].GetComponent<AnimationController>();
-        AnimationController.AnimationFinished += HandleAnimationFinished;
-        AnimationController.Init();        
-        Logger.Log($"Start rendering job {currentCaptureJob.Guid} with settings {GifWidth}x{GifHeight} capture time {AnimationController.AnimationDuration}");
+        AnimationControllers = AssetBundlesLoader.CaptureParents[currentCaptureJob.slotIndex].GetComponentsInChildren<AnimationController>();      
+
+        foreach (var controller in AnimationControllers)
+        {
+            controller.Init();
+        }
+        LongestAnimationController = AnimationControllers.OrderByDescending(a => a.AnimationDuration).First();
+        LongestAnimationController.AnimationFinished += HandleAnimationFinished;
+
+        Logger.Log($"Start rendering job {currentCaptureJob.Guid} with settings {GifWidth}x{GifHeight} capture time {LongestAnimationController.AnimationDuration}");
     }
 
     void HandleAnimationFinished()
@@ -41,7 +49,7 @@ public class GifCaptureManager : MonoBehaviour
     public void StopCapturing()
     {
         Capturing = false;
-        AnimationController.AnimationFinished -= HandleAnimationFinished;
+        LongestAnimationController.AnimationFinished -= HandleAnimationFinished;
     }
 
     public void InitializeFileSystemWatcher()
@@ -68,7 +76,10 @@ public class GifCaptureManager : MonoBehaviour
     {
         if (Capturing)
         {
-            AnimationController.NextFrame();
+            foreach (var controller in AnimationControllers)
+            {
+                controller.NextFrame();
+            }            
             //Necessary for batchmode
             GetComponent<Camera>().Render();
             CaptureFrame();
