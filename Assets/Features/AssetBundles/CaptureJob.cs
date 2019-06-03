@@ -7,5 +7,6 @@ public class CaptureJob
     public CaptureJobStatus Status;
     public int slotIndex;
     public Action<CaptureJob> JobAction;
-    public string CaptureFilePath;
+    public string CaptureGifFilePath;
+    public string CapturePngFilePath;
 }

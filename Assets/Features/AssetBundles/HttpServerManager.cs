@@ -84,7 +84,7 @@ public class HttpServerManager : MonoBehaviour
                     currentContext.Response.StatusCode = (int)HttpStatusCode.OK;
                     using (var s = currentContext.Response.OutputStream)
                     {
-                        var buffer = captureResult.Raw;
+                        var buffer = captureResult.RawGif;
                         s.Write(buffer, 0, buffer.Length);                        
                     }                    
                 }
@@ -100,11 +100,45 @@ public class HttpServerManager : MonoBehaviour
             }
             catch (FileNotFoundException)
             {
-                //TODO
+                currentContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception)
             {
-                //TODO
+                currentContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+        }
+        else if (request.Url.AbsolutePath == Constants.Routes.GetPngByGuid)
+        {
+            try
+            {
+                //PARSE QUERIES...
+                var captureResult = CaptureJobsManager.GetCaptureResult(new Guid(request.Url.Query.Replace("?q=", string.Empty)));
+                if (captureResult.Status == CaptureJobStatus.Completed)
+                {
+                    currentContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                    using (var s = currentContext.Response.OutputStream)
+                    {
+                        var buffer = captureResult.RawPng;
+                        s.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                else
+                {
+                    currentContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                    using (var s = currentContext.Response.OutputStream)
+                    {
+                        var buffer = ASCIIEncoding.ASCII.GetBytes(Enum.GetName(typeof(CaptureJobStatus), captureResult.Status));
+                        s.Write(buffer, 0, buffer.Length);
+                    }
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                currentContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+            catch (Exception)
+            {
+                currentContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
         }
         else

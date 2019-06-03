@@ -36,6 +36,7 @@
 
         public const string RequestRandomShieldGuid = "/RequestRandomShieldGuid";
         public const string GetGifByGuid = "/GetGifByGuid";
+        public const string GetPngByGuid = "/GetPngByGuid";
     }
 
     public struct SceneManagers

@@ -185,20 +185,14 @@ public class CaptureJobsManager : MonoBehaviour
         if (job == null) return new CaptureResult { Status = CaptureJobStatus.NotFound };
         if (job.Status != CaptureJobStatus.Completed) return new CaptureResult { Status = job.Status };
 
-        var filePath = job.CaptureFilePath;
-        if (filePath != null)
+        var resultGif = File.ReadAllBytes(job.CaptureGifFilePath);
+        var resultPng = File.ReadAllBytes(job.CapturePngFilePath);
+        return new CaptureResult
         {
-            var result = File.ReadAllBytes(filePath);
-            return new CaptureResult
-            {
-                Raw = result,
-                Status = CaptureJobStatus.Completed
-            };
-        }
-        else
-        {
-            throw new FileNotFoundException();
-        }
+            RawGif = resultGif,
+            RawPng = resultPng,
+            Status = CaptureJobStatus.Completed
+        };
     }
 
     void HandleCaptureJobCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

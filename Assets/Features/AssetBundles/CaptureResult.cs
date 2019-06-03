@@ -1,5 +1,6 @@
 ﻿public class CaptureResult
 {
-    public byte[] Raw;
+    public byte[] RawGif;
+    public byte[] RawPng;
     public CaptureJobStatus Status;
 }

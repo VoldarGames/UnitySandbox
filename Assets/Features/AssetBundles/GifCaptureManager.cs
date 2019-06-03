@@ -98,7 +98,12 @@ public class GifCaptureManager : MonoBehaviour
         for (int i = 0; i < pngs.Count; i++)
         {
             File.WriteAllBytes($"{Constants.Paths.Pngs}{currentCaptureJob.slotIndex}/{i}.png", pngs[i]);
+
+            //Save static shield image
+            
         }
+        File.WriteAllBytes($"{currentCaptureJob.Guid}.png", pngs[pngs.Count - 1]);
+        currentCaptureJob.CapturePngFilePath = $"{currentCaptureJob.Guid.ToString()}.png";
 
         System.Diagnostics.Process ffmpeg = new System.Diagnostics.Process();
         ffmpeg.StartInfo.FileName = "C:\\Windows\\system32\\cmd.exe";
@@ -113,7 +118,7 @@ public class GifCaptureManager : MonoBehaviour
         {
             Utils.Debounce(() =>
             {
-                currentCaptureJob.CaptureFilePath = $"{currentCaptureJob.Guid.ToString()}.gif";
+                currentCaptureJob.CaptureGifFilePath = $"{currentCaptureJob.Guid.ToString()}.gif";
                 currentCaptureJob.Status = CaptureJobStatus.Completed;
                 CaptureJobsManager.FreeSlot(currentCaptureJob.slotIndex);
                 Directory.Delete($"{Constants.Paths.Pngs}{currentCaptureJob.slotIndex}", true);

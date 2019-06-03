@@ -112,26 +112,30 @@ public class AssetBundlesLoader : MonoBehaviour
 
         try
         {
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Banner, position, parentIndex));
-
+            var bannerIndex = GetRandomShieldLocationIndex(ShieldLocation.Banner);
             var frameIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame);
             var frameSecondIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex);
             var frameThirdIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex, frameSecondIndex);
+            var shapeIndex = GetRandomShieldLocationIndex(ShieldLocation.Shape);
+            var symbolIndex = GetRandomShieldLocationIndex(ShieldLocation.Symbol, acceptsNone: true);
+            var topIndex = GetRandomShieldLocationIndex(ShieldLocation.Top, acceptsNone: true);
+            var wingsIndex = GetRandomShieldLocationIndex(ShieldLocation.Wings, acceptsNone: true);
+
+            StartCoroutine(InstantiateShieldLocation(bannerIndex, ShieldLocation.Banner, position, parentIndex));            
             StartCoroutine(InstantiateShieldLocation(frameIndex, ShieldLocation.Frame, position, parentIndex));
             StartCoroutine(InstantiateShieldLocation(frameSecondIndex, ShieldLocation.FrameSecond, position, parentIndex));
-            StartCoroutine(InstantiateShieldLocation(frameThirdIndex, ShieldLocation.FrameThird, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Shape, position, parentIndex));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Symbol, position, parentIndex, acceptsNone: true));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Top, position, parentIndex, acceptsNone: true));
-            StartCoroutine(InstantiateRandomShieldLocation(ShieldLocation.Wings, position, parentIndex));
+            StartCoroutine(InstantiateShieldLocation(frameThirdIndex, ShieldLocation.FrameThird, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(shapeIndex, ShieldLocation.Shape, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(symbolIndex, ShieldLocation.Symbol, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(topIndex, ShieldLocation.Top, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(wingsIndex, ShieldLocation.Wings, position, parentIndex));
         }
         catch (Exception e)
         {
             var errorMsg = $"Failed to connect to asset bundles server: {e.Message}";
             DebugText.text = errorMsg;
             Logger.Log(errorMsg, Logger.LogLevel.Error);
-        }
-        
+        }        
     }
 
     public void DeleteCaptureSelection(int parentIndex)
@@ -270,88 +274,6 @@ public class AssetBundlesLoader : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
-            DebugText.text += e.Message;
-        }
-    }
-
-    static IEnumerator<object> InstantiateRandomShieldLocation(ShieldLocation location, Vector3 position = default(Vector3), 
-        int parentIndex = -1, bool acceptsNone = false, ShieldLocation keySelection = null)
-    {
-        var prefixLocation = Constants.Prefixes.AssetBundleLocation + location.Value;
-        var prefixAssetList = assetBundleNamesList.Where(s => s.StartsWith(prefixLocation)).ToArray();
-        var prefixAssetListCount = prefixAssetList.Count();
-        int randomIndex = 0;
-        if(prefixAssetListCount > 1)
-        {
-            randomIndex = UnityEngine.Random.Range(acceptsNone ? -1 : 0, prefixAssetListCount);
-        }
-
-        if(randomIndex == -1)
-        {
-            if(keySelection != null)
-            {
-                currentAssetBundlesSelection[keySelection.Value] = string.Empty;
-            }
-            else
-            {
-                currentAssetBundlesSelection[location.Value] = string.Empty;
-            }            
-            yield break;
-        }
-
-        AssetBundle downloadedAssetBundle = null;
-        UnityWebRequest request = null;
-
-        cachedAssetBundles = AssetBundle.GetAllLoadedAssetBundles().ToList();
-        AssetBundle cachedAssetBundle = cachedAssetBundles.FirstOrDefault(a => a.name == prefixAssetList[randomIndex]);
-
-        if (cachedAssetBundle == null)
-        {
-            string uri = Constants.Routes.BackendIp + prefixAssetList[randomIndex];
-
-            Logger.Log($"Request {uri}", Logger.LogLevel.Info);
-
-            request = UnityWebRequestAssetBundle.GetAssetBundle(uri, 0);
-            yield return request.SendWebRequest();
-            if (request.isNetworkError || request.isHttpError)
-            {
-                DebugText.text += "NetworkError, HttpError " + request.error;
-                Logger.Log($"NetworkError, HttpError : " + request.error, Logger.LogLevel.Error);
-                yield break;
-            }
-            downloadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
-        }
-        else
-        {
-            downloadedAssetBundle = cachedAssetBundle;
-        }
-
-        if (downloadedAssetBundle == null)
-        {
-            Logger.Log("Failed to load AssetBundle! Download failed for " + prefixAssetList[randomIndex]
-            + request.error + request.downloadHandler.text, Logger.LogLevel.Error);            
-            yield break;
-        }
-
-        if (keySelection != null)
-        {
-            currentAssetBundlesSelection[keySelection.Value] = prefixAssetList[randomIndex];
-        }
-        else
-        {
-            currentAssetBundlesSelection[location.Value] = prefixAssetList[randomIndex];
-        }
-
-        try
-        {
-            var go = Utils.InstantiateAssetBundle(downloadedAssetBundle, position, parentIndex < 0 ? CurrentParent : CaptureParents[parentIndex]);
-
-            var importablePrefab = go.GetComponent<ImportablePrefab>();
-            var assetBundleDef = importablePrefab.AssetBundleDefinition;
-        }
-        catch (Exception e)
-        {            
             Logger.Log(e.Message + e.StackTrace, Logger.LogLevel.Error);
             DebugText.text += e.Message;
         }
