@@ -14,8 +14,9 @@ public class AssetBundlesLoader : MonoBehaviour
 
     static UnityEngine.UI.Text DebugText;
     static List<string> assetBundleNamesList = new List<string>();
+    static Dictionary<ShieldLocation, List<string>> locationAssetBundlesDictionary = new Dictionary<ShieldLocation, List<string>>();
     static Transform CurrentParent;
-    static Dictionary<string, string> currentAssetBundlesSelection = new Dictionary<string, string>();
+    static Shield currentShieldSelection;
     static List<AssetBundle> cachedAssetBundles;
 
     public void Start()
@@ -45,37 +46,12 @@ public class AssetBundlesLoader : MonoBehaviour
             {
                 Logger.Log("Loading previous saved shield");
 
-                var shapePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationShape);
-                Logger.Log($"Shape: {shapePath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(shapePath), SpawnVector3, CurrentParent);
-
-                var framePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationFrame);
-                Logger.Log($"Frame: {framePath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(framePath), SpawnVector3, CurrentParent);
-
-                var secondFramePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationSecondFrame);
-                Logger.Log($"Second Frame: {secondFramePath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(secondFramePath), SpawnVector3, CurrentParent);
-
-                var thirdFramePath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationThirdFrame);
-                Logger.Log($"Third Frame: {thirdFramePath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(thirdFramePath), SpawnVector3, CurrentParent);
-
-                var bannerPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationBanner);
-                Logger.Log($"Banner: {bannerPath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(bannerPath), SpawnVector3, CurrentParent);
-
-                var symbolPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationSymbol);
-                Logger.Log($"Symbol: {symbolPath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(symbolPath), SpawnVector3, CurrentParent);
-
-                var topPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationTop);
-                Logger.Log($"Top: {topPath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(topPath), SpawnVector3, CurrentParent);
-
-                var wingsPath = PlayerPrefs.GetString(Constants.PlayerPrefsKeys.SavedLocationWings);
-                Logger.Log($"Wings: {wingsPath}");
-                Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(wingsPath), SpawnVector3, CurrentParent);
+                foreach (var key in Constants.PlayerPrefsKeys.AllKeys)
+                {
+                    var path = PlayerPrefs.GetString(key);
+                    Logger.Log($"Shape: {path}");
+                    Utils.InstantiateAssetBundle(Utils.LoadAssetBundleFromFile(path), SpawnVector3, CurrentParent);
+                }
             }
             catch(Exception)
             {
@@ -98,7 +74,7 @@ public class AssetBundlesLoader : MonoBehaviour
         GenerateRandomShield(Vector3.zero);
     }
 
-    public void GenerateRandomShield(Vector3 position, int parentIndex = -1)
+    public Shield GenerateRandomShield(Vector3 position, int parentIndex = -1)
     {
         Logger.Log($"Generating random shield at {position}");
         if (parentIndex < 0)
@@ -112,29 +88,23 @@ public class AssetBundlesLoader : MonoBehaviour
 
         try
         {
-            var bannerIndex = GetRandomShieldLocationIndex(ShieldLocation.Banner);
-            var frameIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame);
-            var frameSecondIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex);
-            var frameThirdIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex, frameSecondIndex);
-            var shapeIndex = GetRandomShieldLocationIndex(ShieldLocation.Shape);
-            var symbolIndex = GetRandomShieldLocationIndex(ShieldLocation.Symbol, acceptsNone: true);
-            var topIndex = GetRandomShieldLocationIndex(ShieldLocation.Top, acceptsNone: true);
-            var wingsIndex = GetRandomShieldLocationIndex(ShieldLocation.Wings, acceptsNone: true);
-
-            StartCoroutine(InstantiateShieldLocation(bannerIndex, ShieldLocation.Banner, position, parentIndex));            
-            StartCoroutine(InstantiateShieldLocation(frameIndex, ShieldLocation.Frame, position, parentIndex));
-            StartCoroutine(InstantiateShieldLocation(frameSecondIndex, ShieldLocation.FrameSecond, position, parentIndex));
-            StartCoroutine(InstantiateShieldLocation(frameThirdIndex, ShieldLocation.FrameThird, position, parentIndex));            
-            StartCoroutine(InstantiateShieldLocation(shapeIndex, ShieldLocation.Shape, position, parentIndex));            
-            StartCoroutine(InstantiateShieldLocation(symbolIndex, ShieldLocation.Symbol, position, parentIndex));            
-            StartCoroutine(InstantiateShieldLocation(topIndex, ShieldLocation.Top, position, parentIndex));            
-            StartCoroutine(InstantiateShieldLocation(wingsIndex, ShieldLocation.Wings, position, parentIndex));
+            currentShieldSelection = GetRandomShield();
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.BannerAssetBundleName, ShieldLocation.Banner, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.FrameAssetBundleName, ShieldLocation.Frame, position, parentIndex));
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.FrameSecondAssetBundleName, ShieldLocation.FrameSecond, position, parentIndex));
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.FrameThirdAssetBundleName, ShieldLocation.FrameThird, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.ShapeAssetBundleName, ShieldLocation.Shape, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.SymbolAssetBundleName, ShieldLocation.Symbol, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.TopAssetBundleName, ShieldLocation.Top, position, parentIndex));            
+            StartCoroutine(InstantiateShieldLocation(currentShieldSelection.WingsAssetBundleName, ShieldLocation.Wings, position, parentIndex));
+            return currentShieldSelection;
         }
         catch (Exception e)
         {
             var errorMsg = $"Failed to connect to asset bundles server: {e.Message}";
             DebugText.text = errorMsg;
             Logger.Log(errorMsg, Logger.LogLevel.Error);
+            return null;
         }        
     }
 
@@ -150,7 +120,7 @@ public class AssetBundlesLoader : MonoBehaviour
     public void DeleteCurrentSelection()
     {
         Logger.Log($"Deleting childs of main selection", Logger.LogLevel.Debug);
-        currentAssetBundlesSelection.Clear();
+        currentShieldSelection = null;
 
         for (int i = 0; i < CurrentParent.childCount; i++)
         {         
@@ -163,9 +133,90 @@ public class AssetBundlesLoader : MonoBehaviour
         StartCoroutine(SaveCurrentSelectionToFileInternal());
     }
 
+    Shield GetRandomShield()
+    {
+        var resultShield = new Shield();
+
+        var bannerIndex = GetRandomShieldLocationIndex(ShieldLocation.Banner);
+        resultShield.BannerId = GetIdFromIndex(ShieldLocation.Banner, bannerIndex);
+        resultShield.BannerAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Banner, bannerIndex);
+
+        var frameIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame);
+        resultShield.FrameId = GetIdFromIndex(ShieldLocation.Frame, frameIndex);
+        resultShield.FrameAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Frame, frameIndex);
+        var frameSecondIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex);
+        resultShield.FrameSecondId = GetIdFromIndex(ShieldLocation.Frame, frameSecondIndex);
+        resultShield.FrameSecondAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Frame, frameSecondIndex);
+        var frameThirdIndex = GetRandomShieldLocationIndex(ShieldLocation.Frame, true, frameIndex, frameSecondIndex);
+        resultShield.FrameThirdId = GetIdFromIndex(ShieldLocation.Frame, frameThirdIndex);
+        resultShield.FrameThirdAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Frame, frameThirdIndex);
+
+        var shapeIndex = GetRandomShieldLocationIndex(ShieldLocation.Shape);
+        resultShield.ShapeId = GetIdFromIndex(ShieldLocation.Shape, shapeIndex);
+        resultShield.ShapeAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Shape, shapeIndex);
+
+        var symbolIndex = GetRandomShieldLocationIndex(ShieldLocation.Symbol, acceptsNone: true);
+        resultShield.SymbolId = GetIdFromIndex(ShieldLocation.Symbol, symbolIndex);
+        resultShield.SymbolAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Symbol, symbolIndex);
+
+        var topIndex = GetRandomShieldLocationIndex(ShieldLocation.Top, acceptsNone: true);
+        resultShield.TopId = GetIdFromIndex(ShieldLocation.Top, topIndex);
+        resultShield.TopAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Top, topIndex);
+
+        var wingsIndex = GetRandomShieldLocationIndex(ShieldLocation.Wings, acceptsNone: true);
+        resultShield.WingsId = GetIdFromIndex(ShieldLocation.Wings, wingsIndex);
+        resultShield.WingsAssetBundleName = GetAssetBundleNameByIndex(ShieldLocation.Wings, wingsIndex);
+
+        return resultShield;
+    }
+
+    string GetAssetBundleNameByIndex(ShieldLocation location, int index)
+    {
+        if (index == -1) return string.Empty;
+        return locationAssetBundlesDictionary[location][index];
+    }
+
+    string GetAssetBundleNameById(ShieldLocation location, int id)
+    {
+        if (id < 0) return string.Empty;
+        var locationAssetBundles = locationAssetBundlesDictionary[location];
+
+        foreach (var assetBundleName in locationAssetBundles)
+        {
+            if (GetIdFromAssetBundleName(location, assetBundleName) == id)
+            {
+                return assetBundleName;
+            }
+        }
+        return string.Empty;
+    }
+
+    int GetIdFromAssetBundleName(ShieldLocation location, string assetBundleName)
+    {
+        var result = assetBundleName.Replace(Constants.Prefixes.AssetBundleLocation + location.Value + "_", string.Empty);
+        var indexOf_ = result.IndexOf("_");
+        result = result.Replace(result.Substring(indexOf_, result.Length - indexOf_), string.Empty);
+        try
+        {
+            return int.Parse(result);
+        }
+        catch
+        {
+            Logger.Log($"Parse error for Asset Bundle Name {assetBundleName}", Logger.LogLevel.Error);
+            return -1;
+        }
+    }
+
+    int GetIdFromIndex(ShieldLocation location, int index)
+    {
+        if (index == -1) return -1;
+
+        return GetIdFromAssetBundleName(location, locationAssetBundlesDictionary[location][index]);
+    }
+
     IEnumerator<object> SaveCurrentSelectionToFileInternal()
     {
-        foreach (var assetBundleName in currentAssetBundlesSelection.Values)
+        foreach (var assetBundleName in currentShieldSelection.GetAllAssetBundleNames())
         {
             UnityWebRequest www = UnityWebRequest.Get(Constants.Routes.BackendIp + assetBundleName);
             yield return www.SendWebRequest();
@@ -209,35 +260,26 @@ public class AssetBundlesLoader : MonoBehaviour
 
     static int GetRandomShieldLocationIndex(ShieldLocation location, bool acceptsNone = false, params int[] bannedIndexes)
     {
-        var prefixLocation = Constants.Prefixes.AssetBundleLocation + location.Value;
-        var prefixAssetList = assetBundleNamesList.Where(s => s.StartsWith(prefixLocation)).ToArray();
-        var prefixAssetListCount = prefixAssetList.Count();
+        var shieldLocationBundlesCount = locationAssetBundlesDictionary[location].Count();
         int randomIndex = 0;
-        if (prefixAssetListCount > 1)
+        if(shieldLocationBundlesCount > 1)
         {
-            randomIndex = Utils.Random(acceptsNone ? -1 : 0, prefixAssetListCount, bannedIndexes);
+            randomIndex = Utils.Random(acceptsNone ? -1 : 0, shieldLocationBundlesCount, bannedIndexes);
         }
-
-        return randomIndex != -1 ? assetBundleNamesList.IndexOf(prefixAssetList[randomIndex]) : -1;
+        return randomIndex;
     }
 
-    static IEnumerator<object> InstantiateShieldLocation(int index, ShieldLocation keySelection, Vector3 position = default, int parentIndex = -1)
+    static IEnumerator<object> InstantiateShieldLocation(string assetBundleName, ShieldLocation keySelection, Vector3 position = default, int parentIndex = -1)
     {
-        if (index == -1)
-        {            
-            currentAssetBundlesSelection[keySelection.Value] = string.Empty;            
-            yield break;
-        }
-
         AssetBundle downloadedAssetBundle = null;
         UnityWebRequest request = null;
 
         cachedAssetBundles = AssetBundle.GetAllLoadedAssetBundles().ToList();
-        AssetBundle cachedAssetBundle = cachedAssetBundles.FirstOrDefault(a => a.name == assetBundleNamesList[index]);
+        AssetBundle cachedAssetBundle = cachedAssetBundles.FirstOrDefault(a => a.name == assetBundleName);
 
         if (cachedAssetBundle == null)
         {
-            string uri = Constants.Routes.BackendIp + assetBundleNamesList[index];
+            string uri = Constants.Routes.BackendIp + assetBundleName;
 
             Logger.Log($"Request {uri}", Logger.LogLevel.Info);
 
@@ -258,12 +300,10 @@ public class AssetBundlesLoader : MonoBehaviour
 
         if (downloadedAssetBundle == null)
         {
-            Logger.Log("Failed to load AssetBundle! Download failed for " + assetBundleNamesList[index]
+            Logger.Log("Failed to load AssetBundle! Download failed for " + assetBundleName
             + request.error + request.downloadHandler.text, Logger.LogLevel.Error);
             yield break;
-        }
-
-        currentAssetBundlesSelection[keySelection.Value] = assetBundleNamesList[index];        
+        }      
 
         try
         {
@@ -305,6 +345,17 @@ public class AssetBundlesLoader : MonoBehaviour
         {
             assetBundleNamesList.Add(name);
         }
+
+        InitLocationAssetBundlesDictionary();
+
         onEndCoroutineCallback?.Invoke();
+    }
+
+    void InitLocationAssetBundlesDictionary()
+    {
+        foreach (var location in ShieldLocation.AllShieldLocations)
+        {
+            locationAssetBundlesDictionary.Add(location, assetBundleNamesList.Where(a => a.StartsWith(Constants.Prefixes.AssetBundleLocation + location.Value)).ToList());
+        }
     }
 }

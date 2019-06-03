@@ -1,4 +1,6 @@
-﻿public struct Constants
+﻿using System.Collections.Generic;
+
+public struct Constants
 {
     public struct Prefixes
     {
@@ -16,7 +18,7 @@
         public const string Pngs = "pngs";
     }
 
-    public struct PlayerPrefsKeys
+    public class PlayerPrefsKeys
     {
         public const string SavedShield = "SavedShield";
         public const string SavedLocationBanner = "SavedLocationBanner";
@@ -27,6 +29,17 @@
         public const string SavedLocationSymbol = "SavedLocationSymbol";
         public const string SavedLocationTop = "SavedLocationTop";
         public const string SavedLocationWings = "SavedLocationWings";
+        public static readonly List<string> AllKeys = new List<string>
+        {
+                SavedLocationBanner,
+                SavedLocationFrame,
+                SavedLocationSecondFrame,
+                SavedLocationThirdFrame,
+                SavedLocationShape,
+                SavedLocationSymbol,
+                SavedLocationTop,
+                SavedLocationWings
+        };
     }
 
     public struct Routes

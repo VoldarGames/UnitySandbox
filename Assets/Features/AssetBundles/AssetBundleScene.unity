@@ -295,8 +295,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CaptureJobsManager: {fileID: 1037487082}
-  CaptureTime: 10
-  FrameRate: 15
   MyRenderTexture: {fileID: 8400000, guid: 1fe29ceda60a15e478e7d25c41f97a23, type: 2}
   GifWidth: 256
   GifHeight: 256
@@ -752,7 +750,7 @@ MonoBehaviour:
     type: 3}
   AutoRun: 1
   AutoDispatchSeconds: 2
-  MaxConcurrentJobs: 200
+  MaxConcurrentJobs: 20
   CamerasX: 0
   CamerasY: 0
   CamerasZ: -2
