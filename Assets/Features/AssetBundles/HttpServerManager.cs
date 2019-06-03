@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class HttpServerManager : MonoBehaviour
 {
-    public int MaxConcurrentRequests = 1;
     public int Port = 50000;
     public bool IsListening;    
     HttpListenerContext currentContext;
