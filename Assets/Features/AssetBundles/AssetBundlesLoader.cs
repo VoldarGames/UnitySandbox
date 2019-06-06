@@ -271,6 +271,11 @@ public class AssetBundlesLoader : MonoBehaviour
 
     static IEnumerator<object> InstantiateShieldLocation(string assetBundleName, ShieldLocation keySelection, Vector3 position = default, int parentIndex = -1)
     {
+        if(string.IsNullOrEmpty(assetBundleName))
+        {
+            Logger.Log("Skipping empty asset bundle");
+            yield break;
+        }
         AssetBundle downloadedAssetBundle = null;
         UnityWebRequest request = null;
 

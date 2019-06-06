@@ -13,9 +13,13 @@ public struct Constants
         public const string ImportablePrefabs = "Assets/Features/AssetBundles";
         public const string AssetBundlesBuildFolderAndroid = "Assets/Features/AssetBundles/BuildFolder/Android";
         public const string AssetBundlesBuildFolderIOS = "Assets/Features/AssetBundles/BuildFolder/iOS";
-        public const string AssetBundlesBuildFolderStandalone = "Assets/Features/AssetBundles/BuildFolder/Standalone";
+        public const string AssetBundlesBuildFolderStandaloneW64 = "Assets/Features/AssetBundles/BuildFolder/StandaloneWindows64";
         public const string AssetBundlesNames = "AssetBundleNames.csv";
         public const string Pngs = "pngs";
+
+        public const string AndroidUploadFolderName = "Android";
+        public const string IOSUploadFolderName = "iOS";
+        public const string StandaloneWindows64UploadFolderName = "StandaloneWindows64";
     }
 
     public class PlayerPrefsKeys
