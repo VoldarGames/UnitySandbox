@@ -48,7 +48,7 @@ public struct Constants
 
     public struct Routes
     {
-        public const string BackendIp = "http://127.0.0.1:8080/"; //office "http://172.16.11.36:8080/"
+        public const string BackendIp = "http://127.0.0.1:8080/StandaloneWindows64/"; //office "http://172.16.11.36:8080/"
         public const string AssetBundlesNames = BackendIp + Paths.AssetBundlesNames;
 
         public const string RequestRandomShieldGuid = "/RequestRandomShieldGuid";
